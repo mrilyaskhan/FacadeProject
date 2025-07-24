@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="text-dark fw-bold mb-0">➕ Add Ongoing Project</h4>
+    <a href="{% url 'ongoing_projects_list' %}" class="btn btn-secondary btn-sm rounded-pill px-3">
+        ← Back to List
+    </a>
+</div>
+
+<form method="post" class="ongoing-project-form card shadow-sm p-4 rounded mx-auto">
+    {% csrf_token %}
+
+    <h5 class="ongoing-heading mb-3">🔑 Project Details</h5>
+    <div class="row g-3 mb-4">
+         <div class="col-md-4">
+            <label class="ongoing-label">{{ form.date.label }}</label>
+            {{ form.date|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.code.label }}</label>
+            {{ form.code|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.po_number.label }}</label>
+            {{ form.po_number|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.client.label }}</label>
+            {{ form.client|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-6">
+            <label class="ongoing-label">{{ form.location.label }}</label>
+            {{ form.location|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-6">
+            <label class="ongoing-label">{{ form.po_description.label }}</label>
+            {{ form.po_description|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.po_amount.label }}</label>
+            {{ form.po_amount|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.budgetary_cost.label }}</label>
+            {{ form.budgetary_cost|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.expected_profit.label }}</label>
+            {{ form.expected_profit|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-6">
+            <label class="ongoing-label">{{ form.down_payment.label }}</label>
+            {{ form.down_payment|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-6">
+            <label class="ongoing-label">{{ form.shop_drawing.label }}</label>
+            {{ form.shop_drawing|add_class:"form-control ongoing-input" }}
+        </div>
+    </div>
+
+   <!-- Component Status Section -->
+<h5 class="text-primary fw-semibold mb-3 mt-4">⚙️ Component Status</h5>
+
+<div id="components-container">
+    {% for label in component_labels %}
+    <div class="card p-3 mb-3 shadow-sm static-component">
+        <h6 class="fw-bold text-dark mb-3">{{ label }}</h6>
+        <input type="hidden" name="component_name_{{ forloop.counter }}" value="{{ label }}">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label class="ongoing-label">Material Procurement</label>
+                <select name="material_procurement_{{ forloop.counter }}" class="form-control ongoing-input">
+                    <option value="N/A">N/A</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="ongoing-label">Fabrication</label>
+                <select name="fabrication_{{ forloop.counter }}" class="form-control ongoing-input">
+                    <option value="N/A">N/A</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="ongoing-label">HDG</label>
+                <select name="hdg_{{ forloop.counter }}" class="form-control ongoing-input">
+                    <option value="N/A">N/A</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="ongoing-label">Powder Coating</label>
+                <select name="powder_coating_{{ forloop.counter }}" class="form-control ongoing-input">
+                    <option value="N/A">N/A</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="ongoing-label">Erection</label>
+                <select name="erection_{{ forloop.counter }}" class="form-control ongoing-input">
+                    <option value="N/A">N/A</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Add + Save Button Row -->
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <button type="button" class="btn btn-outline-secondary" onclick="addComponent()">➕ Add Component</button>
+    <button type="submit" class="btn btn-primary">💾 Save Project</button>
+</div>
+
+<!-- JavaScript for Adding Components -->
+<script>
+    let componentCount = parseInt("{{ component_labels|length|default:'0' }}");
+
+    function addComponent() {
+        componentCount++;
+        const container = document.getElementById("components-container");
+
+        const html = `
+        <div class="card p-3 mb-3 shadow-sm static-component position-relative">
+            <h6 class="fw-bold text-dark mb-3">
+                <input type="text" name="component_name_${componentCount}" placeholder="Component Name" class="form-control ongoing-input" style="display:inline-block; width:auto;">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Close" onclick="this.closest('.card').remove()"></button>
+            </h6>
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label class="ongoing-label">Material Procurement</label>
+                    <select name="material_procurement_${componentCount}" class="form-control ongoing-input">
+                        <option value="N/A">N/A</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label">Fabrication</label>
+                    <select name="fabrication_${componentCount}" class="form-control ongoing-input">
+                        <option value="N/A">N/A</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label">HDG</label>
+                    <select name="hdg_${componentCount}" class="form-control ongoing-input">
+                        <option value="N/A">N/A</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label">Powder Coating</label>
+                    <select name="powder_coating_${componentCount}" class="form-control ongoing-input">
+                        <option value="N/A">N/A</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label">Erection</label>
+                    <select name="erection_${componentCount}" class="form-control ongoing-input">
+                        <option value="N/A">N/A</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+    }
+</script>
+
+{% endblock %}

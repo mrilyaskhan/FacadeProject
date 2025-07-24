@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h4 class="text-dark fw-semibold mb-2">📄 View Ongoing Project</h4>
+
+<!-- Card container for buttons + project details -->
+<div class="card shadow-sm p-3 mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">🔑 Project Details</h5>
+    <div class="d-flex gap-2">
+      <a href="{% url 'export_ongoing_project_excel' project.id %}" class="btn btn-success btn-sm">
+        ⬇️ Export to Excel
+      </a>
+      <a href="{% url 'download_ongoing_project_pdf' project.id %}" class="btn btn-danger btn-sm">
+        📄 Download PDF
+      </a>
+      <a href="{% url 'edit_ongoing_project' project.id %}" class="btn btn-outline-primary btn-sm">
+        ✏️ Edit
+      </a>
+    </div>
+  </div>
+
+  <table class="project-details-table">
+  <tbody>
+    <tr>
+      <th>Date</th>
+      <td>{{ project.date|date:"d M Y" }}</td>
+      <th>Code</th>
+      <td>{{ project.code }}</td>
+      <th>Contract / PO No</th>
+      <td>{{ project.po_number }}</td>
+    </tr>
+    <tr>
+      <th>Client</th>
+      <td>{{ project.client }}</td>
+      <th>Location</th>
+      <td>{{ project.location }}</td>
+      <th>PO Amount</th>
+      <td>{{ project.po_amount }}</td>
+    </tr>
+    <tr>
+      <th>Budgetary Cost</th>
+      <td>{{ project.budgetary_cost }}</td>
+      <th>Expected Profit</th>
+      <td>{{ project.expected_profit }}</td>
+      <th>Down Payment</th>
+      <td>{{ project.down_payment }}</td>
+    </tr>
+    <tr>
+      <th>Shop Drawing</th>
+      <td>{{ project.shop_drawing }}</td>
+      <th>Description</th>
+      <td colspan="3">{{ project.po_description }}</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+<!-- 🔧 Component Status Table -->
+<div class="card p-4 shadow-sm">
+  <h5 class="fw-bold text-primary mb-3">🔧 Component Status</h5>
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle text-center">
+      <thead class="table-light">
+        <tr>
+          <th>Component</th>
+          <th>Material Procurement</th>
+          <th>Fabrication</th>
+          <th>HDG</th>
+          <th>Powder Coating</th>
+          <th>Erection</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in components %}
+        <tr>
+          <td>{{ c.component }}</td>
+          <td>{{ c.material_procurement }}</td>
+          <td>{{ c.fabrication }}</td>
+          <td>{{ c.hdg }}</td>
+          <td>{{ c.powder_coating }}</td>
+          <td>{{ c.erection }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Back Button -->
+  <div class="text-start">
+    <a href="{% url 'ongoing_projects_list' %}" class="btn btn-secondary btn-sm">
+      ← Back to List
+    </a>
+  </div>
+</div>
+
+
+{% endblock %}

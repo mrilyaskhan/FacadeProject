@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm p-4">
+        <h4 class="mb-4 text-center text-primary fw-bold">Edit Delivery Note</h4>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Delivery Note Fields -->
+            <div class="row">
+                {% for field in form %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        {{ field|add_class:"form-control" }}
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- Delivery Items Formset -->
+            <h5 class="text-dark mb-3">Delivery Items</h5>
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>Remarks</th>
+                        <th>Delete?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ formset.management_form }}
+                    {% for form in formset %}
+                    <tr>
+                        <td style="display:none;">
+                            {{ form.id }}
+                        </td>
+                        <td>{{ form.description|add_class:"form-control" }}</td>
+                        <td>{{ form.quantity|add_class:"form-control" }}</td>
+                        <td>{{ form.unit|add_class:"form-control" }}</td>
+                        <td>{{ form.remarks|add_class:"form-control" }}</td>
+                        <td class="text-center">{{ form.DELETE }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'delivery_notes_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left-circle"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Update
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

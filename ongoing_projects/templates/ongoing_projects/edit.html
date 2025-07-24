@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block content %}
+<h4 class="text-dark fw-bold mb-2">✏️ Edit Ongoing Project</h4>
+
+
+<form method="post" class="edit-project-form card p-4 shadow-sm rounded mx-auto">
+    {% csrf_token %}
+
+     <!-- Full-width underline with heading and back button -->
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+            <h5 class="ongoing-heading mb-0">🔑 Project Details</h5>
+            <a href="{% url 'view_ongoing_project' project.id %}" class="btn btn-sm btn-secondary">↩ Back to View</a>
+        </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.date.label }}</label>
+            {{ form.date|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.code.label }}</label>
+            {{ form.code|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.po_number.label }}</label>
+            {{ form.po_number|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.client.label }}</label>
+            {{ form.client|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-6">
+            <label class="ongoing-label">{{ form.location.label }}</label>
+            {{ form.location|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-6">
+            <label class="ongoing-label">{{ form.po_description.label }}</label>
+            {{ form.po_description|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.po_amount.label }}</label>
+            {{ form.po_amount|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.budgetary_cost.label }}</label>
+            {{ form.budgetary_cost|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-4">
+            <label class="ongoing-label">{{ form.expected_profit.label }}</label>
+            {{ form.expected_profit|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-6">
+            <label class="ongoing-label">{{ form.down_payment.label }}</label>
+            {{ form.down_payment|add_class:"form-control ongoing-input" }}
+        </div>
+        <div class="col-md-6">
+            <label class="ongoing-label">{{ form.shop_drawing.label }}</label>
+            {{ form.shop_drawing|add_class:"form-control ongoing-input" }}
+        </div>
+    </div>
+
+      <!-- ⚙️ Component Status Section Header with Back Button -->
+    <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+        <h5 class="text-primary fw-semibold mb-0">⚙️ Component Status</h5>
+    </div>
+    {{ formset.management_form }}
+
+    <div id="formset-container">
+        {% for form in formset %}
+        <div class="card p-3 mb-3 shadow-sm static-component position-relative">
+            {{ form.id }} 
+             <!--  Delete checkbox (hidden, styled like icon) -->
+           {% if form.DELETE %}
+            <div class="delete-component-icon position-absolute top-0 end-0 m-2">
+                <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 delete-trigger" data-target="id_{{ form.prefix }}-DELETE">
+                <i class="bi bi-trash-fill"></i> Delete
+                </button>
+                <input type="checkbox" name="{{ form.prefix }}-DELETE" id="id_{{ form.prefix }}-DELETE" class="d-none delete-checkbox" />
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="ongoing-label">{{ form.component.label }}</label>
+                    {{ form.component|add_class:"form-control ongoing-input" }}
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label">{{ form.material_procurement.label }}</label>
+                    {{ form.material_procurement|add_class:"form-control ongoing-input" }}
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label">{{ form.fabrication.label }}</label>
+                    {{ form.fabrication|add_class:"form-control ongoing-input" }}
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label">{{ form.hdg.label }}</label>
+                    {{ form.hdg|add_class:"form-control ongoing-input" }}
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label">{{ form.powder_coating.label }}</label>
+                    {{ form.powder_coating|add_class:"form-control ongoing-input" }}
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label">{{ form.erection.label }}</label>
+                    {{ form.erection|add_class:"form-control ongoing-input" }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="d-flex justify-content-between mt-3">
+        <button type="submit" class="btn btn-primary">💾 Update Project</button>
+        <a href="{% url 'view_ongoing_project' project.id %}" class="btn btn-secondary">↩ Back</a>
+    </div>
+
+    <!-- Add Component Button BELOW -->
+    <div class="mt-3">
+        <button type="button" class="btn btn-outline-secondary" id="add-component-btn">➕ Add Component</button>
+    </div>
+
+    <!-- Hidden template for new form -->
+    <div id="empty-form-template" style="display:none;">
+        <div class="card p-3 mb-3 shadow-sm static-component position-relative">
+            <!-- ❌ Close button -->
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-2" onclick="this.closest('.card').remove()" aria-label="Remove"></button>
+
+            <!-- ✅ Hidden ID field -->
+            <input type="hidden" name="form-__prefix__-id" id="id_form-__prefix__-id" />
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="ongoing-label" for="id_form-__prefix__-component">Component</label>
+                    <input type="text" name="form-__prefix__-component" class="form-control ongoing-input" id="id_form-__prefix__-component" />
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label" for="id_form-__prefix__-material_procurement">Material Procurement</label>
+                    <select name="form-__prefix__-material_procurement" class="form-control ongoing-input" id="id_form-__prefix__-material_procurement">
+                        <option value="N/A">N/A</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label" for="id_form-__prefix__-fabrication">Fabrication</label>
+                    <select name="form-__prefix__-fabrication" class="form-control ongoing-input" id="id_form-__prefix__-fabrication">
+                        <option value="N/A">N/A</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label" for="id_form-__prefix__-hdg">HDG</label>
+                    <select name="form-__prefix__-hdg" class="form-control ongoing-input" id="id_form-__prefix__-hdg">
+                        <option value="N/A">N/A</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label" for="id_form-__prefix__-powder_coating">Powder Coating</label>
+                    <select name="form-__prefix__-powder_coating" class="form-control ongoing-input" id="id_form-__prefix__-powder_coating">
+                        <option value="N/A">N/A</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="ongoing-label" for="id_form-__prefix__-erection">Erection</label>
+                    <select name="form-__prefix__-erection" class="form-control ongoing-input" id="id_form-__prefix__-erection">
+                        <option value="N/A">N/A</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- JS to add new component -->
+<script>
+    // ADD COMPONENT (existing logic)
+    const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+    const formContainer = document.getElementById('formset-container');
+    const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+
+    document.getElementById('add-component-btn').addEventListener('click', () => {
+        const formIndex = parseInt(totalForms.value);
+        const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
+        formContainer.insertAdjacentHTML('beforeend', newFormHtml);
+        totalForms.value = formIndex + 1;
+
+        // Re-bind delete buttons for newly added form (in case future dynamic delete support is needed)
+        bindDeleteTriggers();
+    });
+
+    // DELETE COMPONENT (new logic)
+    function bindDeleteTriggers() {
+        document.querySelectorAll('.delete-trigger').forEach(button => {
+            button.removeEventListener('click', handleDeleteClick); // prevent duplicate binding
+            button.addEventListener('click', handleDeleteClick);
+        });
+    }
+
+    function handleDeleteClick() {
+        const checkboxId = this.getAttribute('data-target');
+        const checkbox = document.getElementById(checkboxId);
+        if (checkbox) {
+            checkbox.checked = true;
+            this.closest('.static-component').style.opacity = '0.5';
+            this.innerHTML = '<i class="bi bi-x-circle-fill"></i> Marked';
+            this.classList.remove('btn-outline-danger');
+            this.classList.add('btn-outline-secondary');
+            this.disabled = true;
+        }
+    }
+
+    // Bind delete buttons on page load
+    window.addEventListener('DOMContentLoaded', bindDeleteTriggers);
+</script>
+
+
+{% endblock %}

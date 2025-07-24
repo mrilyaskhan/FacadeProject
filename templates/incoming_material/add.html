@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="text-dark fw-semibold mb-0">➕ Add INCOMING MATERIAL REPORTS</h4>
+    <a href="{% url 'incoming_material_list' %}" class="btn btn-secondary btn-sm rounded-pill px-3">
+        🔙 Back to List
+    </a>
+</div>
+
+
+<div class="container">
+    <form method="post" class="incoming-material-form">
+    {% csrf_token %}
+        <div style="width: 100%; display: flex; gap: 20px; flex-wrap: wrap; margin-top: -12px;">
+            <div style="width: 250px; margin-bottom: 12px;">
+                {{ form.date.label_tag }}<br>
+                {{ form.date|add_class:"report-input" }}
+             </div>
+
+             <div style="width: 250px; margin-bottom: 12px;">
+                {{ form.ref_no.label_tag }}<br>
+                {{ form.ref_no|add_class:"report-input" }}
+            </div>
+        </div>
+
+        <h5 class="mb-2">Material Items</h5>
+
+        <table class="table incoming-material-table">
+            <thead>
+                <tr>
+                    <th>S. No</th>
+                    <th>Item Name</th>
+                    <th>Dimensions</th>
+                    <th>Qty</th>
+                    <th>Supply Name</th>
+                    <th>Unit</th>
+                    <th>Notes</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+           <tbody id="formset-table-body">
+                {% for form in formset %}
+                <tr class="form-row">
+                    <td class="serial-number">{{ forloop.counter }}</td>
+                    <td>{{ form.item_name|add_class:"form-control" }}</td>
+                    <td>{{ form.dimensions|add_class:"form-control" }}</td>
+                    <td>{{ form.quantity|add_class:"form-control" }}</td>
+                    <td>{{ form.supply_name|add_class:"form-control" }}</td>
+                    <td>{{ form.unit|add_class:"form-control" }}</td>
+                    <td class="notes-td">{{ form.notes|add_class:"form-control notes-textarea" }}</td>
+                    <td class="action-td">
+                        <button type="button" class="btn-remove-row" title="Remove row">✖</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {{ formset.management_form }}
+
+        <button type="button" id="add-item" class="btn-add-material">Add Material</button>
+        <button type="submit" class="btn-submit-material">Submit</button>
+    </form>
+</div>
+
+
+<!-- ✅ Custom row template (not full <table>) -->
+<script type="text/template" id="empty-form-template">
+<tr class="form-row">
+    <td class="serial-number">__serial__</td>
+    <td>{{ formset.empty_form.item_name }}</td>
+    <td>{{ formset.empty_form.dimensions }}</td>
+    <td>{{ formset.empty_form.quantity }}</td>
+    <td>{{ formset.empty_form.supply_name }}</td>
+    <td>{{ formset.empty_form.unit }}</td>
+    <td>{{ formset.empty_form.notes }}</td>
+    <td class="action-td">
+        <button type="button" class="btn-remove-row">✖</button>
+        {{ formset.empty_form.DELETE }}
+    </td>
+</tr>
+</script>
+
+
+<!-- ✅ Working JavaScript -->
+<script>
+    const addBtn = document.getElementById('add-item');
+    const formsetBody = document.getElementById('formset-table-body');
+    let formIndex = parseInt("{{ formset.total_form_count|default:0 }}");
+
+    // Update serial numbers for all rows
+    function updateSerialNumbers() {
+        const rows = formsetBody.querySelectorAll("tr.form-row");
+        rows.forEach((row, index) => {
+            row.querySelector(".serial-number").textContent = index + 1;
+        });
+    }
+
+    // Add new row on button click
+    addBtn.addEventListener('click', function () {
+        const template = document.getElementById('empty-form-template').innerHTML;
+        const newRow = document.createElement('tr');
+        newRow.classList.add('form-row');
+
+        // Replace only __prefix__ with formIndex for Django formset field names/IDs
+        // Keep __serial__ as is; updateSerialNumbers() will fix it right after
+        newRow.innerHTML = template.replace(/__prefix__/g, formIndex);
+
+        formsetBody.appendChild(newRow);
+
+        formIndex++;
+        document.getElementById('id_form-TOTAL_FORMS').value = formIndex;
+
+        updateSerialNumbers();
+    });
+
+    // Remove row on clicking the remove button
+   formsetBody.addEventListener('click', function (e) {
+    if (e.target.classList.contains('btn-remove-row')) {
+        e.target.closest('tr').remove();
+
+        formIndex--;
+        document.getElementById('id_form-TOTAL_FORMS').value = formIndex;
+
+            updateSerialNumbers();
+        }
+    });
+
+    // Initial numbering on page load
+    updateSerialNumbers();
+</script>
+
+
+{% endblock %}

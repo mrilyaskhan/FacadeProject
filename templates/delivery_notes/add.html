@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+{% block content %}
+
+
+<div class="d-flex justify-content-between align-items-center">
+    <h4 class="mb-0 text-dark">➕ Add New Delivery Note</h4>
+    <a href="{% url 'delivery_notes_list' %}" class="btn btn-secondary btn-sm rounded-pill px-3">
+        ← Back to List
+    </a>
+</div>
+
+<div class="form-wrapper mt-2 pt-0">
+    <div class="card shadow-sm p-4">
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- DeliveryNote Fields -->
+            <div class="form-group mb-3">
+                <label class="form-label">Client Name</label>
+                {{ form.client_name|add_class:"form-control" }}
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Contract No</label>
+                {{ form.contract_no|add_class:"form-control" }}
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Supply To</label>
+                {{ form.supply_to|add_class:"form-control" }}
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Location</label>
+                {{ form.location|add_class:"form-control" }}
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Ref Number</label>
+                {{ form.ref_number|add_class:"form-control" }}
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Date</label>
+                {{ form.date|add_class:"form-control" }}
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Status</label>
+                {{ form.status|add_class:"form-control" }}
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Delivery Items (Dynamic Rows) -->
+            <h5 class="mb-3">Delivery Items</h5>
+            {{ formset.management_form }}
+            <div id="delivery-items">
+                {% for item_form in formset %}
+                    <div class="item-row border p-3 rounded mb-3 bg-light">
+                        {{ item_form.id }}  <!-- Important: hidden ID field -->
+                        <div class="row g-3 align-items-end">
+                            <!-- S.No column -->
+                            <div class="col-md-1">
+                                <label class="form-label">S.No</label>
+                                <input type="text" class="form-control" value="{{ forloop.counter }}" readonly>
+                            </div>                        
+                            <!-- Description -->
+                            <div class="col-md-3">
+                                <label class="form-label">Description</label>
+                                {{ item_form.description|add_class:"form-control" }}
+                            </div>
+                            <!-- Quantity -->
+                            <div class="col-md-1">
+                                <label class="form-label">Qty</label>
+                                {{ item_form.quantity|add_class:"form-control" }}
+                            </div>
+                            <!-- Unit -->
+                            <div class="col-md-1">
+                                <label class="form-label">Unit</label>
+                                {{ item_form.unit|add_class:"form-control" }}
+                            </div>
+                            <!-- Remarks -->
+                            <div class="col-md-4">
+                                <label class="form-label">Remarks</label>
+                                {{ item_form.remarks|add_class:"form-control" }}
+                            </div>
+
+                            <!-- Remove button -->
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger btn-sm remove-form">×</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Add / Save / Back buttons -->
+           <div class="row g-2 align-items-end">
+                <!-- Add Item Button -->
+                <div class="col-auto">
+                    <label class="form-label d-none d-md-block">&nbsp;</label>
+                    <button type="button" id="add-form" class="btn btn-outline-primary btn-sm">
+                        + Add Delivery Item
+                    </button>
+                </div>
+
+                <!-- PDF Upload -->
+                <div class="col">
+                    <label class="form-label">Upload PDF</label>
+                    {{ form.pdf_file|add_class:"form-control form-control-sm" }}
+                </div>
+
+                <!-- Save and Back Buttons -->
+                <div class="col-auto d-flex align-items-end">
+                    <div>
+                        <button type="submit" class="btn btn-success me-2">Save Delivery Note</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript for dynamic form handling -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('delivery-items');
+    const totalForms = document.getElementById('id_form-TOTAL_FORMS'); // Matches prefix='form'
+
+    document.getElementById('add-form').addEventListener('click', () => {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.item-row:last-child');
+        const newForm = lastForm.cloneNode(true);
+
+        // Clear and update cloned form inputs
+        newForm.querySelectorAll('input, select, textarea').forEach(input => {
+            if (input.name) {
+                // Update the form index in name and id attributes
+                input.name = input.name.replace(/-\d+-/, `-${formCount}-`);
+                input.id = input.id.replace(/-\d+-/, `-${formCount}-`);
+            }
+
+            // Clear value if not readonly or hidden
+            if (!input.readOnly && input.type !== 'hidden') {
+                input.value = '';
+            }
+
+            // Clear hidden id field for new form to prevent update conflicts
+            if (input.name && input.name.endsWith('-id')) {
+                input.value = '';
+            }
+
+            // Uncheck checkboxes if any (for can_delete fields or others)
+            if (input.type === 'checkbox') {
+                input.checked = false;
+            }
+        });
+
+        // Update visible S.No input
+        const snoField = newForm.querySelector('input[readonly]');
+        if (snoField) snoField.value = formCount + 1;
+
+        // Append new form and increment total form count
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+
+    // Remove form logic with reindexing
+    container.addEventListener('click', e => {
+        if (e.target.classList.contains('remove-form')) {
+            const rows = container.querySelectorAll('.item-row');
+            if (rows.length > 1) {
+                e.target.closest('.item-row').remove();
+
+                // Decrement total forms count
+                totalForms.value = rows.length - 1;
+
+                // Reindex S.No fields and update input names and ids to keep formset consistent
+                container.querySelectorAll('.item-row').forEach((row, idx) => {
+                    // Update S.No
+                    const sno = row.querySelector('input[readonly]');
+                    if (sno) sno.value = idx + 1;
+
+                    // Update all input/select/textarea names and ids
+                    row.querySelectorAll('input, select, textarea').forEach(input => {
+                        if (input.name) {
+                            // Replace the index with current idx
+                            input.name = input.name.replace(/-\d+-/, `-${idx}-`);
+                            input.id = input.id.replace(/-\d+-/, `-${idx}-`);
+                        }
+                    });
+                });
+            }
+        }
+    });
+});
+</script>
+
+
+{% endblock %}

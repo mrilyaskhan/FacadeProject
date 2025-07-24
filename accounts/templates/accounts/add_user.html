@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-2">
+    <h3 class="form-passion-title">🌟 Welcome a New Team Member!</h3>
+    
+    <!-- Error Messages -->
+    {% if messages %}
+    <div class="alert-messages mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form method="post" class="glass-morphism-form">
+        {% csrf_token %}
+        
+        <div class="form-passion-section">
+            <h5 class="form-passion-section-title">🔐 User Details</h5>
+            
+            <!-- Username Field -->
+            <div class="mb-4">
+                <label for="{{ form.username.id_for_label }}" class="form-label glass-label">
+                    {{ form.username.label }}
+                </label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div class="text-danger mt-2">
+                    {% for error in form.username.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Password Field -->
+            <div class="mb-4">
+                <label for="{{ form.password.id_for_label }}" class="form-label glass-label">
+                    {{ form.password.label }}
+                </label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <div class="text-danger mt-2">
+                    {% for error in form.password.errors %}
+                    <small>{{ error }}</small><br>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="password-help text-muted mt-1">
+                    <small>Must include: uppercase, lowercase, number, and symbol</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-passion-actions">
+            <button type="submit" class="glass-btn glass-btn-primary">
+                Create User Account
+            </button>
+            <a href="{% url 'dashboard' %}" class="glass-btn glass-btn-secondary ms-2">
+                Not Now
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordField = document.getElementById('{{ form.password.id_for_label }}');
+    const passwordHelp = document.querySelector('.password-help');
+    
+    function validatePassword() {
+        const value = passwordField.value;
+        if (value.length === 0) return true;
+        
+        // Check all complexity requirements
+        const hasUpper = /[A-Z]/.test(value);
+        const hasLower = /[a-z]/.test(value);
+        const hasNumber = /[0-9]/.test(value);
+        const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+        
+        return hasUpper && hasLower && hasNumber && hasSymbol;
+    }
+    
+    passwordField.addEventListener('input', function() {
+        if (this.value.length === 0) {
+            passwordHelp.classList.remove('text-danger');
+            passwordHelp.classList.add('text-muted');
+            return;
+        }
+        
+        if (!validatePassword()) {
+            passwordHelp.classList.remove('text-muted');
+            passwordHelp.classList.add('text-danger');
+        } else {
+            passwordHelp.classList.remove('text-danger');
+            passwordHelp.classList.add('text-muted');
+        }
+    });
+});
+</script>
+
+{% endblock content %}

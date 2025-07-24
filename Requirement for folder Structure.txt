@@ -1,0 +1,147 @@
+My Project structure
+
+FacadeProject/
+│
+├── db.sqlite3
+├── manage.py
+│
+├── FacadeProject/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+│
+├── delivery_notes/
+│   ├── __init__.py
+│   ├── admin.py           ← Add admin config here
+│   ├── apps.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   └── urls.py
+│
+├── incoming_material/
+│   ├── __init__.py
+│   ├── admin.py           ← Add admin config here
+│   ├── apps.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   └── urls.py
+│
+├── accounts/
+│   ├── __init__.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/accounts/
+│       ├── password_change.html
+│       └── password_change_done.html
+│
+├── ongoing_projects/
+│   ├── __init__.py
+│   ├── admin.py           ← Add admin config here
+│   ├── apps.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/ongoing_projects/
+│       ├── add.html
+│       ├── list.html
+│       └── view.html
+│
+├── templates/
+│   ├── base.html
+│   └── registration/
+│       └── login.html
+│
+├── static/
+│   └── css/
+│       └── custom.css
+│
+├── media/
+
+
+FacadeProject/
+│
+├── db.sqlite3
+├── manage.py
+│
+├── 📁 FacadeProject/             # Main project config
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+│
+├── 📁 delivery_notes/            # Delivery Notes App
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+    ├── urls.py
+
+├── 📁 incoming_material/         # Incoming Material App
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   ├── urls.py
+
+├── 📁 accounts/                  # Custom accounts app
+│   ├── __init__.py
+│   ├── views.py
+│   ├── urls.py
+│   └── 📁 templates/accounts/
+│       ├── password_change.html
+│       └── password_change_done.html
+✅ delivery_notes app uses:
+📁 templates/delivery_notes/
+├── add.html        ← For adding delivery notes
+├── list.html       ← Shows all delivery notes
+├── view.html       ← View individual note
+└── edit.html       ← Edit existing note
+📁 templates/incoming_material/
+├── add.html        ← For adding incoming material reports
+├── list.html       ← Shows all incoming material entries
+├── view.html       ← View individual incoming report
+└── edit.html       ← You are modifying this one now
+├── 📁 ongoing_projects/          # Ongoing Projects App
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   ├── urls.py
+│   └── 📁 templates/ongoing_projects/
+│       ├── add.html
+│       ├── list.html
+│       └── view.html
+📁 templates/delivery_notes/
+├── add.html        ← For adding delivery notes
+├── list.html       ← Shows all delivery notes
+├── view.html       ← View individual note
+└── edit.html       ← Edit existing note
+✅ incoming_material app uses:
+📁 templates/incoming_material/
+├── add.html        ← For adding incoming material reports
+├── list.html       ← Shows all incoming material entries
+├── view.html       ← View individual incoming report
+└── edit.html       ← You are modifying this one now
+├── 📁 ongoing_projects/          # Ongoing Projects App
+├── 📁 templates/                 # Project-level templates
+│   ├── base.html
+└── ├── dashbaord.html
+│   └── 📁 registration/
+│       └── login.html
+│
+├── 📁 static/                    # Static files
+│   └── 📁 css/
+│       └── custom.css
+│
+├── 📁 media/    
+

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h4 class="text-dark fw-semibold mb-4">👁 View Incoming Material</h4>
+
+<!-- ✅ Edit Button -->
+<div class="mb-3">
+    <a href="{% url 'edit_incoming_material' report.id %}" class="btn btn-primary">
+        ✏ Edit
+    </a>
+</div>
+
+<!-- Info table -->
+<table class="info-table mb-3">
+    <tr>
+        <th>Date</th>
+        <td>{{ report.date|date:"d M Y" }}</td>
+        <th>Ref No</th>
+        <td>{{ report.ref_no }}</td>
+    </tr>
+</table>
+
+<!-- Items table -->
+<table class="material-items-table mb-4">
+    <thead>
+        <tr>
+            <th>S. No</th>
+            <th>Item Name</th>
+            <th>Dimensions</th>
+            <th>Quantity</th>
+            <th>Supply Name</th>
+            <th>Unit</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in report.items.all %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.item_name }}</td>
+            <td>{{ item.dimensions }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.supply_name }}</td>
+            <td>{{ item.unit }}</td>
+            <td>{{ item.notes }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- ✅ Back to List Button -->
+<div class="d-flex gap-2 mt-3">
+    <a href="{% url 'incoming_material_list' %}" class="btn btn-secondary">
+        🔙 Back to List
+    </a>
+    <a href="{% url 'export_incoming_material_excel' report.id %}" class="btn btn-success">
+        📥 Export to Excel
+    </a>
+</div>
+
+{% endblock %}

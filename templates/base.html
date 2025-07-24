@@ -1,0 +1,310 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Facade Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
+    
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header class="custom-header px-4">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center">
+            <!-- Left side: Logo + Title -->
+            <div class="d-flex align-items-center">
+                <img src="{% static 'images/udadateone.png' %}" alt="Company Logo" class="logo-img">
+                <h3 class="mb-0 ms-2">Fursan Steel Factory - Dashboard</h3>
+            </div>
+
+           <!-- Right side: User info + Logout -->
+           {% if user.is_authenticated %}
+            <div class="d-flex align-items-center gap-2 position-relative">
+
+                <!-- Logout Button -->
+                <form method="post" action="{% url 'logout' %}" class="mb-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-dark btn-sm px-2 py-1">Logout</button>
+                </form>
+
+                <!-- Avatar Dropdown -->
+                <div class="dropdown">
+                    <a href="#" class="d-block dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if user.profile.avatar %}
+                            <img 
+                                src="{{ user.profile.avatar.url }}" 
+                                alt="Avatar" 
+                                class="rounded-circle avatar-hover" 
+                                style="width:32px; height:32px; cursor:pointer;" 
+                                title="{{ user.get_full_name|default:user.username }}"
+                            >
+                        {% else %}
+                            <img 
+                                src="{% static 'images/default-avatar.png' %}" 
+                                alt="Default Avatar" 
+                                class="rounded-circle avatar-hover" 
+                                style="width:32px; height:32px; cursor:pointer;" 
+                                title="{{ user.get_full_name|default:user.username }}"
+                            >
+                        {% endif %}
+                    </a>
+                   <ul class="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="{% url 'profile' %}">👤 Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'password_change' %}">🔒 Change Password</a></li>
+                        <li><hr class="dropdown-divider"></li> <!-- optional divider -->
+                        <li><a class="dropdown-item" href="{% url 'add_user' %}">➕ Add User</a></li>
+                    </ul>
+
+                </div>
+            </div>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Login</a>
+            {% endif %}
+
+        </div>
+    </div>
+</header>
+
+    <div class="d-flex">
+        <!-- Sidebar -->
+       <nav id="sidebar" class="vh-100">
+            <div class="d-flex justify-content-between align-items-center px-3 mb-4">
+                <h5 class="text-white mb-0">Menu</h5>
+                <button id="sidebarToggle" class="btn btn-outline-light" title="Toggle Menu">
+                    <i class="bi bi-list fs-4"></i>  
+                </button>
+
+            </div>
+            <ul class="nav flex-column">
+
+                <!-- 🔷 Dashboard -->
+               <li class="nav-item">
+                    <a class="nav-link text-white" href="{% url 'dashboard' %}" title="Dashboard">
+                        🏠 <span class="label-text">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Ongoing Projects dropdown -->
+                <li class="nav-item">
+                    <a class="nav-link text-white"
+                        data-bs-toggle="collapse"
+                        href="#ongoingSubmenu"
+                        role="button"
+                        aria-expanded="true"
+                        aria-controls="ongoingSubmenu">
+                        🏗 <span class="label-text">Ongoing Projects</span>
+                    </a>
+                    <div class="collapse ps-2" id="ongoingSubmenu">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="{% url 'ongoing_projects_list' %}">📄 View All</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="{% url 'add_ongoing_project' %}">➕ Add New</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Delivery Notes dropdown -->
+                <li class="nav-item">
+                    <a class="nav-link text-white" 
+                        data-bs-toggle="collapse" 
+                        href="#deliverySubmenu" 
+                        role="button" 
+                        aria-expanded="false" 
+                        aria-controls="deliverySubmenu">
+                         📦 <span class="label-text">Delivery Notes</span>
+                    </a>
+                    <div class="collapse ps-2" id="deliverySubmenu">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="{% url 'delivery_notes_list' %}">📄 View All</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="{% url 'add_delivery_note' %}">➕ Add New</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Incoming Material dropdown -->
+                <li class="nav-item">
+                    <a class="nav-link text-white"
+                        data-bs-toggle="collapse"
+                        href="#incomingSubmenu"
+                        role="button"
+                        aria-expanded="false"
+                        aria-controls="incomingSubmenu">
+                        📥 <span class="label-text">Incoming Material</span>
+                    </a>
+                    <div class="collapse ps-2" id="incomingSubmenu">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="{% url 'incoming_material_list' %}">📄 View All</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="{% url 'add_incoming_material' %}">➕ Add New</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+            </ul>
+    </nav>
+    <!-- Notification-style alerts -->
+        <div class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1100; width: 350px;">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="toast show align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body d-flex align-items-center">
+                                {% if message.tags == 'success' %}
+                                    <i class="bi bi-check-circle-fill text-success fs-4 me-2"></i>
+                                {% elif message.tags == 'error' %}
+                                    <i class="bi bi-exclamation-triangle-fill text-danger fs-4 me-2"></i>
+                                {% else %}
+                                    <i class="bi bi-info-circle-fill text-primary fs-4 me-2"></i>
+                                {% endif %}
+                                <span class="text-dark">{{ message }}</span>
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+    <!-- Main content area -->
+    <main class="flex-grow-1 p-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+</div>
+<script>
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+</script>
+<script>
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Sidebar functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const toggleIcon = toggleBtn.querySelector('i');
+        const main = document.querySelector('main.flex-grow-1');
+
+        // Toggle sidebar open/close
+        toggleBtn.addEventListener('click', function() {
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            main.classList.toggle('expanded');
+            
+            // Change icon
+            toggleIcon.classList.toggle('bi-list', !isCollapsed);
+            toggleIcon.classList.toggle('bi-arrow-right', isCollapsed);
+            
+            // Close all submenus when collapsing sidebar
+            if (isCollapsed) {
+                closeAllSubmenus();
+            }
+        });
+
+        // Handle submenu toggle (show/hide) when sidebar is collapsed
+        document.querySelectorAll('#sidebar .nav-link[data-bs-toggle="collapse"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!sidebar.classList.contains('collapsed')) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                const isSubmenuShowing = target.classList.contains('show');
+                
+                // Toggle current submenu
+                if (isSubmenuShowing) {
+                    closeSubmenu(target);
+                } else {
+                    // Close all other submenus first
+                    closeAllSubmenus();
+                    openSubmenu(this, target);
+                }
+            });
+        });
+
+        // Close submenu when clicking a submenu item
+        document.querySelectorAll('#sidebar .collapse .nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (sidebar.classList.contains('collapsed')) {
+                    closeAllSubmenus();
+                }
+            });
+        });
+
+        // Close submenus when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!sidebar.classList.contains('collapsed')) return;
+            
+            const clickedInsideSidebar = e.target.closest('#sidebar');
+            if (!clickedInsideSidebar) {
+                closeAllSubmenus();
+            }
+        });
+
+        // Function to open a submenu
+        function openSubmenu(linkElement, target) {
+            new bootstrap.Collapse(target, { toggle: true }).show();
+            
+            const rect = linkElement.getBoundingClientRect();
+            Object.assign(target.style, {
+                position: 'fixed',
+                left: '70px',
+                top: `${rect.top}px`,
+                minWidth: '160px',
+                backgroundColor: 'darkcyan',
+                zIndex: '1001',
+                borderRadius: '0 5px 5px 0',
+                boxShadow: '2px 2px 5px rgba(0,0,0,0.2)'
+            });
+        }
+
+        // Function to close a specific submenu
+        function closeSubmenu(target) {
+            new bootstrap.Collapse(target, { toggle: false }).hide();
+        }
+
+        // Function to close all submenus (except optional one to keep open)
+        function closeAllSubmenus(except = null) {
+            document.querySelectorAll('#sidebar .collapse.show').forEach(el => {
+                if (!except || el !== except) {
+                    closeSubmenu(el);
+                }
+            });
+        }
+    });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toasts = document.querySelectorAll('.toast');
+    toasts.forEach(toast => {
+        setTimeout(() => {
+            new bootstrap.Toast(toast).hide();
+        }, 5000);
+    });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

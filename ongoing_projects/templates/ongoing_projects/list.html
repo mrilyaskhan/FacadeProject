@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow-sm custom-card p-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+
+        <!-- Left: Title -->
+        <h4 class="text-dark fw-semibold mb-0" style="line-height: 2.2rem;">📋 Ongoing Projects</h4>
+
+        <!-- Center: Search, Date, Filter -->
+        <form method="get" class="d-flex align-items-center gap-2 flex-nowrap mb-0" style="min-width: 400px; max-width: 600px;">
+            <!-- Search input + Go -->
+            <div class="input-group input-group-sm shadow-sm rounded-pill overflow-hidden border" style="height: 32px; min-width: 140px;">
+            <span class="input-group-text bg-white border-0 px-2">
+                <i class="bi bi-search text-dark"></i>
+            </span>
+            <input type="text" name="q" class="form-control border-0" placeholder="Search..." value="{{ request.GET.q|default:'' }}" style="font-size: 13px;">
+            <button class="btn btn-dark border-0 rounded-0 rounded-end px-2" type="submit" name="search">Go</button>
+            </div>
+
+            <!-- Date input -->
+            <div class="input-group input-group-sm shadow-sm rounded-pill overflow-hidden border" style="height: 32px; min-width: 130px;">
+            <span class="input-group-text bg-white border-0 px-2">
+                <i class="bi bi-calendar text-dark"></i>
+            </span>
+            <input type="date" name="date" value="{{ request.GET.date|default:'' }}" class="form-control border-0" style="font-size: 13px;">
+            </div>
+
+            <!-- Filter button -->
+            <button class="btn btn-primary btn-sm rounded-pill px-3" type="submit" name="filter" value="1" style="height: 32px;">
+            Filter
+            </button>
+        </form>
+
+        <!-- Refresh button (outside form so it doesn’t submit) -->
+        {% if request.GET.q or request.GET.date %}
+        <a href="{% url 'ongoing_projects_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" style="height: 32px;">
+            🔄
+        </a>
+        {% endif %}
+
+        <div class="d-flex gap-2">
+            <!-- Add New Ongoing Project -->
+            <a class="btn btn-primary btn-sm shadow-sm rounded-pill px-3 d-flex align-items-center justify-content-center" 
+                style="height: 32px;" 
+                href="{% url 'add_ongoing_project' %}">
+                ➕ Add Project
+            </a>
+
+            <!-- Excel Export -->
+            <a href="{% url 'export_ongoing_projects_to_excel' %}" 
+                class="btn btn-success btn-sm shadow-sm rounded-pill px-3 d-flex justify-content-center align-items-center" 
+                style="height: 32px; width: 110px;">
+                ⬇️ Excel
+            </a>
+            </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover bg-white mb-0 custom-ongoing-table">
+            <thead class="custom-thead">
+                <tr>
+                    <th>S. No</th>
+                    <th>Code</th>
+                    <th>PO No</th>
+                    <th>Client</th>
+                    <th>Project Location</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for project in projects %}
+            <tr class="fixed-row-height">
+                <td>{{ forloop.counter|add:projects.start_index|add:"-1" }}</td>
+                <td>{{ project.code }}</td>
+                <td>{{ project.po_number }}</td>
+                <td>{{ project.client }}</td>
+                <td>{{ project.location }}</td>
+                <td>{{ project.date|date:"d M Y" }}</td>
+                <td>
+                    {% if project.status == 'Complete' %}
+                        <span class="badge bg-success">Complete</span>
+                    {% else %}
+                        <span class="badge bg-danger">Progress</span>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    <a href="{% url 'view_ongoing_project' project.id %}" class="text-info text-decoration-none me-2">
+                        <i class="bi bi-eye-fill fs-5"></i>
+                    </a>
+                    <a href="{% url 'delete_ongoing_project' project.id %}" onclick="return confirm('Are you sure you want to delete this item?')" class="text-decoration-none">
+                        <i class="bi bi-trash-fill text-danger fs-5"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center text-muted">No projects available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if projects.has_other_pages %}
+    <div class="d-flex justify-content-end">
+        <ul class="pagination pagination-sm mb-0">
+            {% if projects.has_previous %}
+            <li class="page-item">
+                <a class="page-link px-2" href="?page={{ projects.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">« Prev</a>
+            </li>
+            {% endif %}
+            {% for num in projects.paginator.page_range %}
+                {% if num >= projects.number|add:-2 and num <= projects.number|add:2 %}
+                    {% if projects.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link px-2 py-1">{{ num }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link px-2 py-1" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}">
+                                {{ num }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if projects.has_next %}
+            <li class="page-item">
+                <a class="page-link px-2 py-1" href="?page={{ projects.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next »</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
