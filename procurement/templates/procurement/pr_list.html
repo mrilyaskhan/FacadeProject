@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-1 pr-list-header">
+    <!-- Title with icon -->
+    <h4 class="m-0 text-dark">
+        <i class="bi bi-card-checklist me-2"></i> Purchase Requests
+    </h4>
+
+    <div class="d-flex align-items-center gap-2">
+        <!-- Add PR button with increased width -->
+        <a href="{% url 'pr_add' %}" class="btn btn-sm btn-primary px-4">Add PR</a>
+
+        <!-- Search form -->
+        <form method="get" class="mx-auto">
+            <div class="input-group input-group-sm shadow-sm rounded-pill overflow-hidden border" style="height: 38px; max-width: 280px;">
+                <span class="input-group-text bg-white border-0">
+                    <i class="bi bi-search text-dark"></i>
+                </span>
+                <input type="text" name="q" class="form-control border-0"
+                    placeholder="Search purchase requests..."
+                    value="{{ request.GET.q|default:'' }}" style="font-size: 14px;">
+                <button class="btn btn-dark border-0 rounded-0 rounded-end" type="submit">Go</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table pr-list-table">
+    <thead class="pr-table-head">
+        <tr>
+            <th>ID</th>
+            <th>Requested By</th>
+            <th>Project</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pr in prs %}
+        <tr>
+            <td><a href="{% url 'pr_detail' pr.pk %}">PR-{{ pr.id }}</a></td>
+            <td>{{ pr.requested_by }}</td>
+            <td>{{ pr.project }}</td>
+            <td>{{ pr.get_status_display }}</td>
+            <td>{{ pr.request_date }}</td>
+            <td>
+                {% if is_manager %}
+                    <a href="{% url 'pr_approve' pr.pk %}" class="btn btn-sm btn-warning">Review</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">No PRs yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- 🧭 Pagination aligned bottom right -->
+<div class="d-flex justify-content-end mt-2">
+    <nav aria-label="Page navigation">
+        <ul class="pagination mb-0">
+            <!-- Previous -->
+            {% if prs.has_previous %}
+            <li class="page-item">
+                <a class="page-link px-2 py-1" href="?page={{ prs.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo; Previous</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link px-2 py-1">&laquo; Previous</span>
+            </li>
+            {% endif %}
+
+            <!-- Page Numbers -->
+            {% for num in prs.paginator.page_range %}
+                {% if num >= prs.number|add:-2 and num <= prs.number|add:2 %}
+                    {% if prs.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link px-2 py-1">{{ num }}</span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link px-2 py-1" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            <!-- Next -->
+            {% if prs.has_next %}
+            <li class="page-item">
+                <a class="page-link px-2 py-1" href="?page={{ prs.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next &raquo;</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link px-2 py-1">Next &raquo;</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

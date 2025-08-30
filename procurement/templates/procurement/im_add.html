@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>Add Incoming Material Report</h4>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <h5>Items</h5>
+  {{ formset.management_form }}
+  <table class="table">
+    <thead><tr><th>PO Item (optional)</th><th>Item</th><th>Qty</th><th>Unit</th></tr></thead>
+    <tbody>
+      {% for f in formset %}
+      <tr>
+        <td>{{ f.po_item }}</td>
+        <td>{{ f.item_name }}</td>
+        <td>{{ f.quantity }}</td>
+        <td>{{ f.unit }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <button class="btn btn-success">Save Report</button>
+  <a href="{% url 'im_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

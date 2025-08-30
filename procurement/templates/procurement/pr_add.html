@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="pr_add container">
+  <h4 class="pr-add-title mb-4">Create Purchase Request</h4>
+
+  <form method="post" id="pr-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+    {% if formset.non_form_errors %}
+      <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+    {% endif %}
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label>{{ form.requested_by.label }}</label>
+        {{ form.requested_by }}
+        {% if form.requested_by.errors %}
+          <div class="text-danger">{{ form.requested_by.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-6">
+        <label>{{ form.project.label }}</label>
+        <select name="{{ form.project.name }}" class="pr-input">
+          <option value="" disabled selected>Select Ongoing Project</option>
+          {% for choice in form.project.field.queryset %}
+            <option value="{{ choice.pk }}">{{ choice }}</option>
+          {% endfor %}
+        </select>
+        {% if form.project.errors %}
+          <div class="text-danger">{{ form.project.errors }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-md-6">
+        <label>{{ form.status.label }}</label>
+        <label>{{ form.status.label }}</label>
+        {{ form.status }}
+        {% if form.status.errors %}
+          <div class="text-danger">{{ form.status.errors }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="mb-4 pr-notes">
+      {{ form.notes.label_tag }}
+      {{ form.notes }}
+      {% if form.notes.errors %}
+        <div class="text-danger">{{ form.notes.errors }}</div>
+      {% endif %}
+    </div>
+
+    <h5 class="mb-0">Items</h5>
+    {{ formset.management_form }}
+    <table class="table table-bordered pr-items-table" id="items-table">
+      <thead class="pr-table-header">
+        <tr>
+          <th>#</th>
+          <th>Item</th>
+          <th>Note</th>
+          <th>Qty</th>
+          <th>Unit</th>
+          <th>Date Needed</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in formset %}
+        <tr class="form-row">
+          <td class="item-num">{{ forloop.counter }}</td>
+          <td>{{ f.item_name }}</td>
+          <td>{{ f.sku }}</td>
+          <td>{{ f.quantity }}</td>
+          <td>{{ f.unit }}</td>
+          <td>{{ f.date_needed }}</td>
+          <td class="text-center">
+            <input type="checkbox" name="{{ f.DELETE.name }}" class="d-none">
+            <button type="button" class="btn btn-danger btn-sm remove-item" {% if forloop.first %}style="display:none;"{% endif %}>X</button>
+          </td>
+        </tr>
+        {% endfor %}
+
+        <tr id="empty-form-row" class="d-none">
+          <td class="item-num">0</td>
+          <td>{{ formset.empty_form.item_name }}</td>
+          <td>{{ formset.empty_form.sku }}</td>
+          <td>{{ formset.empty_form.quantity }}</td>
+          <td>{{ formset.empty_form.unit }}</td>
+          <td>{{ formset.empty_form.date_needed }}</td>
+          <td class="text-center">
+            <input type="checkbox" name="{{ formset.empty_form.DELETE.name }}" class="d-none">
+            <button type="button" class="btn btn-danger btn-sm remove-item">X</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button type="button" id="add-item" class="btn btn-primary mb-3">Add Item</button>
+    <br>
+    <button type="submit" class="btn btn-success">Save PR</button>
+    <a href="{% url 'pr_list' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addButton = document.getElementById('add-item');
+    const tableBody = document.querySelector('#items-table tbody');
+    const totalForms = document.querySelector('[name$="-TOTAL_FORMS"]');
+    const emptyRowTemplate = document.getElementById('empty-form-row');
+
+    function updateItemNumbers() {
+        const visibleRows = tableBody.querySelectorAll('tr.form-row');
+        visibleRows.forEach((row, idx) => {
+            const td = row.querySelector('.item-num');
+            if(td) td.textContent = idx + 1;
+
+            const btn = row.querySelector('.remove-item');
+            if(btn) btn.style.display = idx === 0 ? 'none' : 'inline-block';
+
+            row.querySelectorAll('input, select').forEach(input => {
+                if(input.name){
+                    const newName = input.name.replace(/-\d+-/, `-${idx}-`);
+                    input.name = newName;
+                    input.id = 'id_' + newName;
+                }
+            });
+        });
+        totalForms.value = visibleRows.length;
+    }
+
+    addButton.addEventListener('click', function () {
+        let formIdx = parseInt(totalForms.value);
+        const newRow = emptyRowTemplate.cloneNode(true);
+        newRow.classList.remove('d-none');
+        newRow.removeAttribute('id');
+        newRow.classList.add('form-row');
+
+        newRow.querySelectorAll('input, select').forEach(function(input){
+            if(input.name){
+                input.name = input.name.replace('__prefix__', formIdx);
+                input.id = 'id_' + input.name;
+            }
+            if(input.type !== 'checkbox') input.value = '';
+            else input.checked = false;
+        });
+
+        tableBody.appendChild(newRow);
+        updateItemNumbers();
+    });
+
+    tableBody.addEventListener('click', function(e){
+        if(e.target && e.target.classList.contains('remove-item')){
+            const row = e.target.closest('tr');
+            const deleteInput = row.querySelector('input[type="checkbox"]');
+            if(deleteInput) deleteInput.checked = true;
+            row.remove();
+            updateItemNumbers();
+        }
+    });
+
+    updateItemNumbers();
+});
+</script>
+{% endblock %}

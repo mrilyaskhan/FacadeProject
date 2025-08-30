@@ -31,6 +31,7 @@ urlpatterns = [
     path('delivery/', include('delivery_notes.urls')),
     path('incoming/', include('incoming_material.urls')),
     path('ongoing/', include('ongoing_projects.urls')),
+    path('procurement/', include('procurement.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

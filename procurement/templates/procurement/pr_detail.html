@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>PR-{{ pr.id }}</h4>
+<p><strong>Requested by:</strong> {{ pr.requested_by }}</p>
+<p><strong>Project:</strong> {{ pr.project }}</p>
+<p><strong>Status:</strong> {{ pr.get_status_display }}</p>
+<h5>Items</h5>
+<table class="table">
+  <thead><tr><th>Item</th><th>Qty</th><th>Unit</th></tr></thead>
+  <tbody>
+    {% for it in pr.items.all %}
+    <tr>
+      <td>{{ it.item_name }}</td>
+      <td>{{ it.quantity }}</td>
+      <td>{{ it.unit }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

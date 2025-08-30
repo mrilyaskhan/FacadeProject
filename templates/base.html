@@ -3,6 +3,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Facade Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -88,6 +90,34 @@
                         🏠 <span class="label-text">Dashboard</span>
                     </a>
                 </li>
+
+                <!-- Procurement Section -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white"
+                           data-bs-toggle="collapse"
+                           href="#procurementSubmenu"
+                           role="button"
+                           aria-expanded="false"
+                           aria-controls="procurementSubmenu">
+                            📦 Procurement
+                        </a>
+                        <div class="collapse ps-2" id="procurementSubmenu">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" href="{% url 'supplier_list' %}">1️⃣ 🏢 Suppliers</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" href="{% url 'pr_list' %}">2️⃣ 📝 Purchase Requests</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" href="{% url 'po_list' %}">3️⃣ 📃 Purchase Orders</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" href="{% url 'im_list' %}">4️⃣ 📦 Incoming Materials</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
 
                 <!-- Ongoing Projects dropdown -->
                 <li class="nav-item">

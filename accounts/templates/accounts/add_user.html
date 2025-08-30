@@ -23,19 +23,17 @@
             
             <!-- Username Field -->
             <div class="mb-4">
-                <label for="{{ form.username.id_for_label }}" class="form-label glass-label">
-                    {{ form.username.label }}
-                </label>
+                {{ form.username.label_tag }}
                 {{ form.username }}
                 {% if form.username.errors %}
-                <div class="text-danger mt-2">
-                    {% for error in form.username.errors %}
-                    <small>{{ error }}</small>
-                    {% endfor %}
-                </div>
+                    <div class="text-danger mt-2">
+                        {% for error in form.username.errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
+                    </div>
                 {% endif %}
             </div>
-            
+
             <!-- Password Field -->
             <div class="mb-4">
                 <label for="{{ form.password.id_for_label }}" class="form-label glass-label">
@@ -53,8 +51,21 @@
                     <small>Must include: uppercase, lowercase, number, and symbol</small>
                 </div>
             </div>
+
+            <!-- Role Selection -->
+          <div class="mb-4">
+                {{ form.role.label_tag }}
+                {{ form.role }}
+                {% if form.role.errors %}
+                    <div class="text-danger mt-2">
+                        {% for error in form.role.errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        
+
         <div class="form-passion-actions">
             <button type="submit" class="glass-btn glass-btn-primary">
                 Create User Account
@@ -70,36 +81,34 @@
 document.addEventListener('DOMContentLoaded', function() {
     const passwordField = document.getElementById('{{ form.password.id_for_label }}');
     const passwordHelp = document.querySelector('.password-help');
-    
+
     function validatePassword() {
         const value = passwordField.value;
         if (value.length === 0) return true;
-        
-        // Check all complexity requirements
-        const hasUpper = /[A-Z]/.test(value);
-        const hasLower = /[a-z]/.test(value);
-        const hasNumber = /[0-9]/.test(value);
-        const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-        
-        return hasUpper && hasLower && hasNumber && hasSymbol;
+
+        // Only check minimum length (6 characters)
+        return value.length >= 6;
     }
-    
+
     passwordField.addEventListener('input', function() {
         if (this.value.length === 0) {
             passwordHelp.classList.remove('text-danger');
             passwordHelp.classList.add('text-muted');
             return;
         }
-        
+
         if (!validatePassword()) {
             passwordHelp.classList.remove('text-muted');
             passwordHelp.classList.add('text-danger');
+            passwordHelp.innerText = "Password must be at least 6 characters long";
         } else {
             passwordHelp.classList.remove('text-danger');
             passwordHelp.classList.add('text-muted');
+            passwordHelp.innerText = "Password must be at least 6 characters long";
         }
     });
 });
 </script>
+
 
 {% endblock content %}

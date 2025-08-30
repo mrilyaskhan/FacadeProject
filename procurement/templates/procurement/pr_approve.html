@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>Review Purchase Request PR-{{ pr.id }}</h4>
+
+<p><b>Requested By:</b> {{ pr.requested_by }}</p>
+<p><b>Project:</b> {{ pr.project }}</p>
+<p><b>Notes:</b> {{ pr.notes }}</p>
+
+<h5>Items</h5>
+<ul>
+  {% for item in pr.items.all %}
+    <li>{{ item.item_name }} - {{ item.quantity }} {{ item.unit }}</li>
+  {% endfor %}
+</ul>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
+  <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+  <a href="{% url 'pr_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

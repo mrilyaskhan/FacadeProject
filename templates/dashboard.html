@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
+<div class="container-fluid">
      <div class="dashboard-header mb-4">
         <div>
             <h2 class="dashboard-title">
@@ -37,26 +37,24 @@
 
     <!-- Stat Cards -->
     <div class="row g-3">
-        <div class="col-md-4">
-            <div class="dashboard-card dashboard-border-danger text-center p-4 shadow-sm rounded position-relative">
-                <h6 class="text-uppercase text-muted mb-1">Ongoing Projects</h6>
-                <h4 class="text-danger fw-bold mb-0">{{ total_ongoing_projects }}</h4>
+            <div class="col-md-4">
+                <div class="dashboard-card dashboard-border-danger text-center h-100">
+                    <h6 class="text-uppercase text-muted mb-1">Ongoing Projects</h6>
+                    <h4 class="text-danger fw-bold mb-0 fs-1">{{ total_ongoing_projects }}</h4>
+                </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="dashboard-card dashboard-border-primary text-center p-4 shadow-sm rounded">
-                <h6 class="text-uppercase text-muted mb-1">Delivery Notes</h6>
-                <h4 class="text-success fw-bold mb-0">{{ total_delivery_notes }}</h4>
+            <div class="col-md-4">
+                <div class="dashboard-card dashboard-border-primary text-center h-100">
+                    <h6 class="text-uppercase text-muted mb-1">Delivery Notes</h6>
+                    <h4 class="text-success fw-bold mb-0 display-5">{{ total_delivery_notes }}</h4>
+                </div>
             </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="dashboard-card dashboard-border-warning text-center p-4 shadow-sm rounded">
-                <h6 class="text-uppercase text-muted mb-1">Incoming Materials</h6>
-                <h4 class="text-warning fw-bold mb-0">{{ total_incoming_materials }}</h4>
+            <div class="col-md-4">
+                <div class="dashboard-card dashboard-border-warning text-center h-100">
+                    <h6 class="text-uppercase text-muted mb-1">Incoming Materials</h6>
+                    <h4 class="text-warning fw-bold mb-0 display-5">{{ total_incoming_materials }}</h4>
+                </div>
             </div>
-        </div>
-
     </div>
     <hr class="my-2">
     <!-- Line Chart Section -->

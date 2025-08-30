@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>Purchase Orders <a href="{% url 'po_add' %}" class="btn btn-sm btn-primary float-end">Create PO</a></h4>
+<table class="table">
+  <thead><tr><th>PO#</th><th>Supplier</th><th>Status</th><th>Date</th></tr></thead>
+  <tbody>
+    {% for po in pos %}
+    <tr>
+      <td><a href="{% url 'po_detail' po.pk %}">{{ po.po_number }}</a></td>
+      <td>{{ po.supplier }}</td>
+      <td>{{ po.get_status_display }}</td>
+      <td>{{ po.order_date }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No POs yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

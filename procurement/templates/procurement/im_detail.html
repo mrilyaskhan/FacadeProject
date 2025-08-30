@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>Incoming Material Report: {{ report.ref_no }}</h4>
+<p><b>Date:</b> {{ report.date }}</p>
+<p><b>PO:</b> {{ report.purchase_order }}</p>
+<p><b>Status:</b> {{ report.get_status_display }}</p>
+<p><b>Approved By:</b> {% if report.approved_by %} {{ report.approved_by.username }} (Manager) {% else %} Not approved {% endif %}</p>
+
+<h5>Items</h5>
+<table class="table">
+  <thead><tr><th>Item</th><th>Qty</th><th>Unit</th></tr></thead>
+  <tbody>
+    {% for item in report.items.all %}
+    <tr>
+      <td>{{ item.item_name }}</td>
+      <td>{{ item.quantity }}</td>
+      <td>{{ item.unit }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a href="{% url 'im_list' %}" class="btn btn-secondary">Back</a>
+{% endblock %}

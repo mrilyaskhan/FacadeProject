@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>Create Purchase Order</h4>
+<form method="post" id="po-form">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <h5>Items</h5>
+  {{ formset.management_form }}
+
+  <table class="table" id="items-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Unit</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in formset %}
+      <tr>
+        <td class="row-number">{{ forloop.counter }}</td>
+        <td>{{ f.item_name }}</td>
+        <td>{{ f.quantity }}</td>
+        <td>{{ f.unit_price }}</td>
+        <td>{{ f.unit }}</td>
+        <td><button type="button" class="btn btn-danger btn-sm remove-row">X</button></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <button type="button" id="add-item" class="btn btn-primary">Add Item</button>
+  <br><br>
+  <button class="btn btn-success">Save PO</button>
+  <a href="{% url 'po_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const addButton = document.getElementById('add-item');
+  const tableBody = document.querySelector('#items-table tbody');
+  const totalForms = document.querySelector('[name$="-TOTAL_FORMS"]');
+
+  // Add item dynamically
+  addButton.addEventListener('click', function () {
+    const formIndex = parseInt(totalForms.value);
+    const emptyRow = `
+      <tr>
+        <td class="row-number">${formIndex + 1}</td>
+        <td><input type="text" name="items-${formIndex}-item_name" class="form-control" /></td>
+        <td><input type="number" name="items-${formIndex}-quantity" class="form-control" /></td>
+        <td><input type="number" step="0.01" name="items-${formIndex}-unit_price" class="form-control" /></td>
+        <td><input type="text" name="items-${formIndex}-unit" class="form-control" /></td>
+        <td><button type="button" class="btn btn-danger btn-sm remove-row">X</button></td>
+      </tr>
+    `;
+    tableBody.insertAdjacentHTML('beforeend', emptyRow);
+    totalForms.value = formIndex + 1;
+    updateRowNumbers();
+  });
+
+  // Remove item row
+  tableBody.addEventListener('click', function (e) {
+    if (e.target.classList.contains('remove-row')) {
+      e.target.closest('tr').remove();
+      totalForms.value = tableBody.querySelectorAll('tr').length;
+      updateRowNumbers();
+    }
+  });
+
+  // Update row numbers
+  function updateRowNumbers() {
+    const rows = tableBody.querySelectorAll('tr');
+    rows.forEach((row, index) => {
+      row.querySelector('.row-number').textContent = index + 1;
+    });
+  }
+});
+</script>
+{% endblock %}
