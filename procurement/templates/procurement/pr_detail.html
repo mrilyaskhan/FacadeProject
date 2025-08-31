@@ -1,20 +1,43 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h4>PR-{{ pr.id }}</h4>
-<p><strong>Requested by:</strong> {{ pr.requested_by }}</p>
-<p><strong>Project:</strong> {{ pr.project }}</p>
-<p><strong>Status:</strong> {{ pr.get_status_display }}</p>
-<h5>Items</h5>
-<table class="table">
-  <thead><tr><th>Item</th><th>Qty</th><th>Unit</th></tr></thead>
-  <tbody>
-    {% for it in pr.items.all %}
-    <tr>
-      <td>{{ it.item_name }}</td>
-      <td>{{ it.quantity }}</td>
-      <td>{{ it.unit }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="pr-detail-card p-4 shadow-sm rounded-3 bg-white">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="pr-header-text m-0">PR-{{ pr.id }}</h4>
+        <!-- Status Badge -->
+        <span class="badge pr-status {{ pr.status|lower }}">
+            {{ pr.get_status_display }}
+        </span>
+    </div>
+
+    <!-- Requested Info -->
+    <div class="mb-4">
+        <p class="pr-header-text mb-1"><strong>Requested by:</strong> {{ pr.requested_by }}</p>
+        <p class="pr-header-text mb-1"><strong>Project:</strong> {{ pr.project }}</p>
+    </div>
+
+    <!-- Items Table -->
+    <h5 class="pr-header-text mb-2">Items</h5>
+    <table class="table pr-items-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Unit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for it in pr.items.all %}
+            <tr>
+                <td>{{ it.item_name }}</td>
+                <td>{{ it.quantity }}</td>
+                <td>{{ it.unit }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
 {% endblock %}

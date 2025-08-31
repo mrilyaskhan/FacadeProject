@@ -19,6 +19,7 @@ urlpatterns = [
     path('purchase-orders/<int:pk>/', views.po_detail, name='po_detail'),
     path("purchase-orders/<int:pk>/request-received/", views.request_received_po, name="request_received_po"),
     path("purchase-orders/<int:pk>/approve-received/", views.approve_received_po, name="approve_received_po"),
+    path('purchase-orders/delete/<int:pk>/', views.po_delete, name='po_delete'),
 
     # Incoming Material (goods receipt)
     path('incoming-materials/', views.im_list, name='im_list'),

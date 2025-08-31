@@ -1,42 +1,64 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h4>PO: {{ po.po_number }}</h4>
-<p><strong>Supplier:</strong> {{ po.supplier }}</p>
-<p><strong>Status:</strong> {{ po.get_status_display }}</p>
+<div class="po-detail-card p-4 shadow-sm rounded-3 bg-white">
 
-<h5>Items</h5>
-<table class="table">
-  <thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
-  <tbody>
-    {% for it in po.items.all %}
-    <tr>
-      <td>{{ it.item_name }}</td>
-      <td>{{ it.quantity }}</td>
-      <td>{{ it.unit_price }}</td>
-      <td>{{ it.total_price }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="po-header-text m-0">PO: {{ po.po_number }}</h4>
+        <span class="badge po-status {{ po.status|lower }}">
+            {{ po.get_status_display }}
+        </span>
+    </div>
 
-<!-- User requests received -->
-{% if po.status == 'sent' and not po.received_request and not request.user.is_superuser and not is_manager %}
-<form method="post" action="{% url 'request_received_po' po.pk %}">
-  {% csrf_token %}
-  <button type="submit" class="btn btn-warning">Request Received</button>
-</form>
-{% endif %}
+    <!-- Supplier Info -->
+     <div class="mb-4">
+      <p class="po-header-text mb-1"><strong>Supplier:</strong> {{ po.supplier }}</p>
+      <p class="po-header-text mb-1"><strong>Date:</strong> {{ po.order_date|date:"M. d, Y" }}</p>
+    </div>
 
-<!-- Manager/Admin approves received -->
-{% if po.received_request %}
-  {% if request.user.is_superuser or is_manager %}
-    <form method="post" action="{% url 'approve_received_po' po.pk %}">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-success">Approve Received</button>
-    </form>
-    <p>Received request pending approval.</p>
-  {% endif %}
-{% endif %}
+    <!-- Items Table -->
+    <h5 class="po-header-text mb-2">Items</h5>
+    <table class="table po-items-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for it in po.items.all %}
+            <tr>
+                <td>{{ it.item_name }}</td>
+                <td>{{ it.quantity }}</td>
+                <td>{{ it.unit_price }}</td>
+                <td>{{ it.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
+    <!-- Action Buttons -->
+    <div class="mt-4 d-flex gap-2 flex-wrap">
+        {% if po.status == 'sent' and not po.received_request and not request.user.is_superuser and not is_manager %}
+        <form method="post" action="{% url 'request_received_po' po.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning btn-sm px-4">Request Received</button>
+        </form>
+        {% endif %}
 
+        {% if po.received_request %}
+            {% if request.user.is_superuser or is_manager %}
+            <form method="post" action="{% url 'approve_received_po' po.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-sm px-4">Approve Received</button>
+            </form>
+            {% endif %}
+            <p class="text-muted align-self-center mb-0">Received request pending approval.</p>
+        {% endif %}
+    </div>
+
+</div>
 {% endblock %}

@@ -108,8 +108,37 @@ def pr_detail(request, pk):
 # Purchase Orders
 @login_required
 def po_list(request):
-    pos = PurchaseOrder.objects.all().order_by('-order_date')
-    return render(request, 'procurement/po_list.html', {'pos': pos})
+    query = request.GET.get('q', '')  # optional search
+    page_number = request.GET.get('page', 1)
+
+    # Base queryset
+    pos_qs = PurchaseOrder.objects.all().order_by('-order_date')
+
+    # Optional search by PO number or supplier
+    if query:
+        pos_qs = [po for po in pos_qs
+                  if query.lower() in str(po.po_number).lower()
+                  or query.lower() in str(po.supplier).lower()]
+
+    # Pagination: 10 per page
+    paginator = Paginator(pos_qs, 10)
+    pos_page = paginator.get_page(page_number)
+
+    context = {
+        'pos': pos_page,
+        'query': query,
+    }
+    return render(request, 'procurement/po_list.html', context)
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser or u.groups.filter(name="Manager").exists())
+def po_delete(request, pk):
+    po = get_object_or_404(PurchaseOrder, pk=pk)
+    po_number = po.po_number
+    po.delete()
+    messages.success(request, f"PO {po_number} has been deleted successfully.")
+    return redirect('po_list')
+
 
 @login_required
 def po_add(request):
